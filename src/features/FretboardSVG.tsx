@@ -1,3 +1,11 @@
+/**
+ * SVG でフレットボード全体を描画するプレゼンテーションコンポーネント。
+ *
+ * - App.tsx から受け取った音情報をもとに、弦やフレット、ポジションマーカー、ラベルを描く。
+ * - notes / overlayNotes / blueNotes の 3 レイヤーを順番に重ねて、スケール・コードトーン・ブルーノートを区別表示する。
+ * - theme/colors.ts の FretTheme を参照し、配色とアクセシビリティを統一する。
+ * - ロジックは最小限に留め、座標計算と SVG レイアウトに集中させることでテスト対象を明確化している。
+ */
 import React from 'react'
 import { PC, pcName, degreeLabel } from '../core/music'
 import type { FretTheme } from '../theme/colors'

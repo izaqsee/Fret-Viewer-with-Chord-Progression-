@@ -1,3 +1,10 @@
+/**
+ * コード進行（12小節など）を横並びに表示し、現在位置をハイライトするコンポーネント。
+ *
+ * - progression 配列をそのまま描画し、onSelectBar で App.tsx へクリック通知を返す。
+ * - currentBar が示す小節は色と太字で目立たせ、演奏位置やループの把握を助ける。
+ * - 視認性のため等幅フォントを使い、Vite/React の最小構成でも視覚的なリズム表を提供できる。
+ */
 import React from 'react'
 
 export function ProgressionView({
