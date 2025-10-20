@@ -1,3 +1,10 @@
+/**
+ * React のレンダリングで例外が発生した際に、画面全体を守るためのフェイルセーフ。
+ *
+ * - 例外を検知すると簡潔な警告メッセージを利用者へ表示し、アプリが真っ白にならないようにする。
+ * - console.error にスタック情報を残すことで、開発者はブラウザコンソールから原因調査ができる。
+ * - App.tsx を StrictMode で囲む際の最上位ラッパーとして、main.tsx から一度だけ生成される。
+ */
 import React from 'react'
 
 export class ErrorBoundary extends React.Component<
