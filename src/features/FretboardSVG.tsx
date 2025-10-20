@@ -4,6 +4,8 @@ import type { FretTheme } from '../theme/colors'
 
 type Note = { x:number; y:number; pc:PC; isScale:boolean; isChordTone:boolean }
 
+// 指板上の各要素（弦、フレット、マーカー、音符）を SVG で描画する純粋表示コンポーネント。
+// App で生成したノート情報を受け取り、テーマ設定や表示フラグに応じてレイヤーごとに描画する。
 export function FretboardSVG(props: {
   width: number
   height: number
@@ -32,6 +34,7 @@ export function FretboardSVG(props: {
   const strings = Math.max(...props.notes.map(n => n.y)) + 0.5
   const frets = props.endFret - props.startFret + 1
 
+  // SVG の余白と格子一辺のサイズを先に計算しておく。
   const padX = 48
   const padY = 24
   const innerW = props.width - padX * 2
@@ -39,10 +42,12 @@ export function FretboardSVG(props: {
   const cellW = innerW / frets
   const cellH = innerH / strings
 
+  // グリッド座標から SVG 座標へ変換するためのヘルパー。
   const xOfCol = (col:number) => padX + col * cellW
   const xOfSpaceCenter = (col:number) => padX + (col + 0.5) * cellW
   const yOfRowCenter = (row:number) => padY + (row + 0.5) * cellH
 
+  // よく使うポジションマーカー（3,5,...）やナット有無を先に算出。
   const markerFrets = [3, 5, 7, 9, 12, 15, 17, 19, 21]
   const hasNut = props.startFret === 0
   const theme = props.theme
@@ -52,7 +57,7 @@ export function FretboardSVG(props: {
       {/* 背景 */}
       <rect x={0} y={0} width={props.width} height={props.height} fill={theme?.bg ?? '#fff'}/>
 
-      {/* 弦（横線） */}
+      {/* 弦（横線）: 1弦と6弦は太さを変え、視覚的な上下を明確にする */}
       {Array.from({ length: strings }).map((_, i) => {
         const y = yOfRowCenter(i)
         const thick = i === 0 || i === strings - 1 ? 2 : 1
@@ -69,7 +74,7 @@ export function FretboardSVG(props: {
         )
       })}
 
-      {/* フレット（縦線） */}
+      {/* フレット（縦線）: 0フレット（ナット）は太線、それ以外は細線 */}
       {Array.from({ length: frets + 1 }).map((_, i) => {
         const fretNumber = props.startFret + i
         let xf = xOfCol(i)
@@ -94,7 +99,7 @@ export function FretboardSVG(props: {
         )
       })}
 
-      {/* ポジションマーカー */}
+      {/* ポジションマーカー: 12フレットのみ二点、それ以外は単点表示 */}
       {markerFrets
         .filter(f => f >= props.startFret && f <= props.endFret)
         .map((m, idx) => {
@@ -117,7 +122,7 @@ export function FretboardSVG(props: {
           )
         })}
 
-      {/* フレット番号（スペース中央） */}
+      {/* フレット番号（スペース中央）: 0フレット開始でも実際の列番号を表示 */}
       {props.showFretNumbers !== false &&
         Array.from({ length: frets }).map((_, i) => {
           const fretNum = props.startFret + i

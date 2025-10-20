@@ -1,6 +1,9 @@
 import React from 'react'
 
+// 指板上の記号に馴染みのないユーザ向けに、図形と意味を並べた凡例を提供する。
+
 export function LegendPanel() {
+  // 1 行分のアイコン＋説明文を共通レイアウトで表示するためのヘルパー。
   const row = (icon: React.ReactNode, text: string, key: React.Key) => (
     <div key={key} style={{display:'flex', alignItems:'center', gap:8, minHeight:22}}>
       <div style={{width:20, height:20, display:'grid', placeItems:'center'}}>{icon}</div>
@@ -17,7 +20,9 @@ export function LegendPanel() {
       maxWidth:560,
       width:'100%'
     }}>
+      {/* 凡例のタイトル。日本語と英語を併記して目的を明確にする */}
       <div style={{textAlign:'center', fontSize:12, marginBottom:6, opacity:.8}}>凡例 / Legend</div>
+      {/* 2カラム構成で凡例を詰め込み、ビジュアルと説明の対応を保つ */}
       <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8}}>
         {row(
           <svg width="18" height="18"><circle cx="9" cy="9" r="8" fill="none" stroke="#000" strokeWidth="2"/><circle cx="9" cy="9" r="5.6" fill="none" stroke="#000" strokeWidth="2"/></svg>,

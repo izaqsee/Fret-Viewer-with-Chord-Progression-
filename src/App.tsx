@@ -1,3 +1,5 @@
+// アプリのメイン画面。スケール設定、コード進行、指板描画、メトロノームなど
+// すべての機能を統合し、状態管理もここで集中して行う。
 // 先頭の import に useRef を足す
 import React, { useMemo, useState, useRef, useEffect } from 'react'
 
@@ -129,6 +131,7 @@ function playClickAtTime(ctx: AudioContext, time: number, accent: boolean, volum
   osc.stop(time + dur + 0.02)
 }
 
+// 拍番号とアクセント設定から、クリックを強調するかどうか判断するヘルパー。
 function isAccentBeat(beat: number, beatsPerBar: number, mode: AccentMode) {
   if (mode === 'even') return false
   if (mode === 'downbeat') return beat === 1
@@ -207,6 +210,8 @@ export default function App() {
   const progression = PROGRESSIONS[progressionId]
 
   // 再生していない時や手動変更時は表示を実バーに合わせる
+  // メトロノームとコード進行の同期を実現するための先読みスケジューラ。
+  // Web Audio API で 100ms 先までイベントを予約し、UI は setTimeout で追従させる。
   useEffect(() => {
     if (!isPlaying) setDisplayBar(currentBar)
   }, [isPlaying, currentBar])
@@ -373,7 +378,7 @@ export default function App() {
 
   return (
     <div style={{padding:'16px', display:'grid', gap:'12px', maxWidth:1280, margin:'0 auto'}}>
-      <h1 style={{margin:0, fontSize:'20px'}}>Fretboard Viewer by izaq</h1>
+      <h1 style={{margin:0, fontSize:'20px'}}>FretNavigator by izaq</h1>
 
       {/* コントロール */}
       <div style={{display:'flex', gap:'12px', flexWrap:'wrap', alignItems:'center'}}>

@@ -1,5 +1,8 @@
 import React from 'react'
 
+// 12小節のコード進行をひと目で確認できる簡易グリッド。
+// 現在の小節をハイライトし、クリックで別バーにジャンプできるようにする。
+
 export function ProgressionView({
   progression,
   currentBar,
@@ -9,6 +12,7 @@ export function ProgressionView({
   currentBar: number
   onSelectBar?: (barIndex: number) => void
 }) {
+  // CSS Grid で 12 コマを横並びに配置し、等幅フォントで運指表のような見た目に寄せる。
   return (
     <div
       style={{
@@ -37,7 +41,7 @@ export function ProgressionView({
               fontWeight: isCurrent ? 700 : 400,
               cursor: 'pointer',
               userSelect: 'none',
-              transition: 'background 0.2s',
+              transition: 'background 0.2s', // マウス操作時も滑らかにハイライトが変化
             }}
             title={`Bar ${bar}: ${chord}`}
           >

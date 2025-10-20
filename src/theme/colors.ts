@@ -1,6 +1,9 @@
+// 指板表示のカラーテーマ定義を一箇所にまとめたモジュール。
+// 色弱（色覚多様性）対応パレットも用意し、テーマ切替によるアクセシビリティ向上を狙う。
 // 色弱対応（Okabe–Ito）＋明快なモノトーンを用意
 export type ThemeId = 'mono' | 'jazz' | 'fusion'
 
+// FretboardSVG に渡されるカラーパレットの構造体。
 export type FretTheme = {
   // 背景/罫線/文字
   bg: string
