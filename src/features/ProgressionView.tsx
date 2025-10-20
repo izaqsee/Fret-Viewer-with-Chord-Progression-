@@ -5,7 +5,7 @@ export function ProgressionView({
   currentBar,
   onSelectBar,
 }: {
-  progression: string[]
+  progression: readonly string[]
   currentBar: number
   onSelectBar?: (barIndex: number) => void
 }) {
