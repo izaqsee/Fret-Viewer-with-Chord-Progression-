@@ -29,14 +29,16 @@ export function FretboardSVG(props: {
   // オプション
   showChordTones?: boolean
   preferExtensions?: boolean // 2/4/6 を 9/11/13 で表示
+  fontScale?: number
   theme?: FretTheme
 }) {
   const strings = Math.max(...props.notes.map(n => n.y)) + 0.5
   const frets = props.endFret - props.startFret + 1
 
   // SVG の余白と格子一辺のサイズを先に計算しておく。
-  const padX = 48
-  const padY = 24
+  const s = Math.max(0.6, Math.min(1.6, props.fontScale ?? 1))
+  const padX = Math.round(48 * s)
+  const padY = Math.round(24 * s)
   const innerW = props.width - padX * 2
   const innerH = props.height - padY * 2
   const cellW = innerW / frets
@@ -90,9 +92,9 @@ export function FretboardSVG(props: {
           <line
             key={'f' + i}
             x1={xf}
-            y1={padY - 8}
+            y1={padY - Math.round(8 * s)}
             x2={xf}
-            y2={padY + innerH + 8}
+            y2={padY + innerH + Math.round(8 * s)}
             stroke={fretNumber===0 ? (theme?.nutStroke ?? '#000') : (theme?.fretStroke ?? '#000')}
             strokeWidth={thick}
           />
@@ -107,6 +109,7 @@ export function FretboardSVG(props: {
           const x = xOfSpaceCenter(col)
           const y = padY + innerH / 2
           const text = m % 12 === 0 ? '••' : '•'
+          const fsMarker = Math.max(10, Math.round(14 * s))
           return (
             <text
               key={'m' + idx}
@@ -114,7 +117,7 @@ export function FretboardSVG(props: {
               y={y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize="14"
+              fontSize={fsMarker}
               fill={theme?.markerFill ?? '#000'}
             >
               {text}
@@ -127,14 +130,15 @@ export function FretboardSVG(props: {
         Array.from({ length: frets }).map((_, i) => {
           const fretNum = props.startFret + i
           const x = xOfSpaceCenter(i)
+          const fsFret = Math.max(10, Math.round(14 * s))
           return (
             <text
               key={'fn' + i}
               x={x}
-              y={padY - 10}
+              y={padY - Math.round(10 * s)}
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize="14"
+              fontSize={fsFret}
               fill={theme?.text ?? '#333'}
             >
               {fretNum}
@@ -147,6 +151,7 @@ export function FretboardSVG(props: {
         (props.tuning ?? []).map((_, idx) => {
           const y = yOfRowCenter(idx)
           const label = (props.tuning ?? [])[strings - 1 - idx]
+          const fsTuning = Math.max(14, Math.round(20 * s))
           return (
             <text
               key={'tl' + idx}
@@ -154,7 +159,7 @@ export function FretboardSVG(props: {
               y={y}
               textAnchor="end"
               dominantBaseline="middle"
-              fontSize="20"
+              fontSize={fsTuning}
               fill={theme?.text ?? '#000'}
             >
               {label}
@@ -222,9 +227,9 @@ export function FretboardSVG(props: {
             )}
 
             {(props.showDeg || props.showNote) && (
-              <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize="18" fill={textFill}>
-                {props.showDeg && <tspan x={cx} dy={-6}>{degLabel}</tspan>}
-                {props.showNote && <tspan x={cx} dy={props.showDeg ? 14 : 0}>{pcName(n.pc, props.keyName)}</tspan>}
+              <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize={Math.max(12, Math.round(18 * s))} fill={textFill}>
+                {props.showDeg && <tspan x={cx} dy={-Math.round(6 * s)}>{degLabel}</tspan>}
+                {props.showNote && <tspan x={cx} dy={props.showDeg ? Math.round(14 * s) : 0}>{pcName(n.pc, props.keyName)}</tspan>}
               </text>
             )}
           </g>
@@ -241,7 +246,7 @@ export function FretboardSVG(props: {
           <g key={'B' + idx}>
             <circle cx={cx} cy={cy} r={r} fill="none" stroke={theme?.overlay.ringStroke ?? '#000'} strokeWidth={1.6} strokeDasharray="4 3" />
             {props.overlayShowLabels && (
-              <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill={theme?.overlay.label ?? '#000'}>
+              <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize={Math.max(8, Math.round(9 * s))} fill={theme?.overlay.label ?? '#000'}>
                 <tspan x={cx} dy={0}>{degB}</tspan>
               </text>
             )}
@@ -267,7 +272,7 @@ export function FretboardSVG(props: {
               strokeWidth={1.8}
               transform={`rotate(0 ${cx} ${cy})`}
             />
-            <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize="18" fill={theme?.blue.label ?? '#000'}>{d}</text>
+            <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize={Math.max(12, Math.round(18 * s))} fill={theme?.blue.label ?? '#000'}>{d}</text>
           </g>
         )
       })}

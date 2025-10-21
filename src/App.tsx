@@ -175,6 +175,51 @@ export default function App() {
   // ブルーノート（b3, b5）
   const [blueOn, setBlueOn] = useState(false)
 
+  // ====== レイアウト（レスポンシブ） ======
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [containerWidth, setContainerWidth] = useState<number>(() => {
+    if (typeof window === 'undefined') return 960
+    return Math.min(window.innerWidth, 1280)
+  })
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const update = () => setContainerWidth(el.clientWidth)
+    update()
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', update)
+      return () => window.removeEventListener('resize', update)
+    }
+
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (entry.target === el) setContainerWidth(entry.contentRect.width)
+      }
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const effectiveWidth = containerWidth || 960
+  const uiScale = useMemo(() => Math.min(1.15, Math.max(0.6, effectiveWidth / 1200)), [effectiveWidth])
+  const baseFontSize = useMemo(() => {
+    const minW = 380
+    const maxW = 1280
+    const clamped = Math.min(maxW, Math.max(minW, effectiveWidth))
+    const ratio = (clamped - minW) / (maxW - minW)
+    return 12 + ratio * 6
+  }, [effectiveWidth])
+  const headingSize = Math.round(Math.max(18, Math.min(28, baseFontSize + 6)))
+  const controlsGap = Math.max(8, Math.round(12 * uiScale))
+  const containerGap = Math.max(10, Math.round(12 * uiScale))
+  const panelPadding = Math.max(8, Math.round(12 * uiScale))
+  const fretboardWidth = Math.min(1200, Math.max(240, effectiveWidth - 2 * panelPadding))
+  const fretboardHeight = Math.round(Math.min(560, Math.max(220, fretboardWidth * 0.36)))
+  const cols = effectiveWidth < 520 ? 4 : (effectiveWidth < 840 ? 6 : 12)
+  const legendCols = effectiveWidth < 520 ? 1 : 2
+
   // ---- 計算 ----
   const tonicA = (keyA % 12) as PC
   const tonicB = (keyB % 12) as PC
@@ -377,11 +422,11 @@ export default function App() {
   
 
   return (
-    <div style={{padding:'16px', display:'grid', gap:'12px', maxWidth:1280, margin:'0 auto'}}>
-      <h1 style={{margin:0, fontSize:'20px'}}>FretNavigator by izaq</h1>
+    <div ref={containerRef} style={{padding:`${panelPadding}px`, display:'grid', gap:`${containerGap}px`, maxWidth:1280, margin:'0 auto'}}>
+      <h1 style={{margin:0, fontSize:`${headingSize}px`}}>FretNavigator by izaq</h1>
 
       {/* コントロール */}
-      <div style={{display:'flex', gap:'12px', flexWrap:'wrap', alignItems:'center'}}>
+      <div style={{display:'flex', gap:`${controlsGap}px`, flexWrap:'wrap', alignItems:'center'}}>
         <label>Theme:{' '}
           <select value={themeId} onChange={e=>setThemeId(e.target.value as ThemeId)}>
             <option value="jazz">Jazz (Colorblind-safe)</option>
@@ -579,14 +624,16 @@ export default function App() {
           progression={progression}
           currentBar={currentBar}
           onSelectBar={(bar)=>setCurrentBar(bar)}
+          cols={cols}
+          scale={uiScale}
         />
       )}
 
       {/* 指板本体 */}
-      <div style={{border:'1px solid #ddd', borderRadius:8, padding:8}}>
+      <div style={{border:'1px solid #ddd', borderRadius:8, padding: panelPadding}}>
         <FretboardSVG
-          width={1200}
-          height={420}
+          width={fretboardWidth}
+          height={fretboardHeight}
           // A（メイン）
           notes={baseNotes}
           startFret={startFret}
@@ -606,12 +653,13 @@ export default function App() {
           // コードトーン描画ON/OFF（塗り）／拡張表記
           showChordTones={chordToneMode !== 'off'}
           preferExtensions={chordToneMode === 'extended'}
+          fontScale={uiScale}
           // テーマ
           theme={theme}
         />
       </div>
 
-      <LegendPanel />
+      <LegendPanel scale={uiScale} cols={legendCols} />
     </div>
   )
 }
